@@ -1,13 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-// FilterDropdown'un aynı dizinde (src/components) olduğu varsayılır:
 import FilterDropdown from './FilterDropdown'; 
 
-/**
- * Navbar'daki interaktif öğeleri (Arama Formu, Dil Seçimi, Filtreler) barındırır.
- * Bu bir İstemci Bileşeni'dir.
- */
 export default function NavbarInteractions() {
 
     const handleSearchSubmit = (e) => {
@@ -16,21 +11,25 @@ export default function NavbarInteractions() {
     };
 
     return (
-        <div className="d-flex align-items-center">
+        <div className="d-flex flex-column flex-lg-row align-items-start align-items-lg-center gap-3">
             
-            {/* 1. Arama Formu */}
-            <form className="d-flex me-3" role="search" onSubmit={handleSearchSubmit}>
+            {/* 1. SIRA: Arama Formu */}
+            <form className="d-flex" role="search" onSubmit={handleSearchSubmit}>
               <input 
-                className="form-control" 
+                className="form-control me-2" 
                 type="search" 
                 placeholder="Bitki Ara..." 
                 aria-label="Search" 
+                style={{ width: 'auto' }} 
               />
-              <button className="btn btn-outline-light ms-2" type="submit">Ara</button>
+              <button className="btn btn-outline-light" type="submit">Ara</button>
             </form>
 
-            {/* 2. Dil Seçeneği Dropdown */}
-            <div className="dropdown me-3">
+            {/* 2. SIRA: Filtreler Dropdown (Dil seçeneğinin önüne alındı) */}
+            <FilterDropdown /> 
+
+            {/* 3. SIRA: Dil Seçeneği Dropdown (En sona alındı) */}
+            <div className="dropdown">
               <button 
                 className="btn btn-outline-light dropdown-toggle"
                 type="button"
@@ -39,14 +38,11 @@ export default function NavbarInteractions() {
               >
                 🇹🇷 TR
               </button>
-              <ul className="dropdown-menu dropdown-menu-end">
+              <ul className="dropdown-menu dropdown-menu-end shadow">
                 <li><Link className="dropdown-item active" href="#">🇹🇷 Türkçe</Link></li>
                 <li><Link className="dropdown-item" href="#">🇬🇧 English</Link></li>
               </ul>
             </div>
-
-            {/* 3. Filtreler Dropdown */}
-            <FilterDropdown /> 
 
         </div>
     );

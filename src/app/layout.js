@@ -1,29 +1,32 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import "bootstrap/dist/css/bootstrap.min.css"; 
 import "./globals.css";
-import "bootstrap/dist/css/bootstrap.min.css"; // Bootstrap CSS burada
-import BootstrapClient from "../components/BootstrapClient"; // 1. Adımda oluşturulan JS tetikleyicisi
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import Header from "../components/Header"; // Yeni Header bileşeni
+import Footer from "../components/Footer";
+import BootstrapClient from "../components/BootstrapClient";
 
 export const metadata = {
   title: "Bitki Rehberi",
-  description: "Türkiye'nin Kapsamlı Bitki Bilgi Sitesi",
+  description: "Bitkiler hakkında her şey",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="tr">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {children}
-        <BootstrapClient /> {/* BURASI KRİTİK: JS Bileşenlerinin çalışmasını sağlar */}
+      <body className="d-flex flex-column min-vh-100 bg-light">
+        
+        {/* NAVBAR (Artık ayrı bir Client Component) */}
+        <Header />
+
+        {/* İÇERİK ALANI */}
+        <main className="flex-grow-1 d-flex flex-column">
+             {children}
+        </main>
+
+        {/* FOOTER */}
+        <Footer />
+        
+        {/* Bootstrap JS Tetikleyicisi */}
+        <BootstrapClient />
       </body>
     </html>
   );

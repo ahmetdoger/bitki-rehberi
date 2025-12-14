@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 
-// Filtre seçenekleri
 const filterOptions = [
     { label: 'Tam Güneş', value: 'Tam Güneş', group: 'light' },
     { label: 'Kısmi Gölge', value: 'Kısmi Gölge', group: 'light' },
@@ -12,24 +11,16 @@ const filterOptions = [
     { label: 'Yüksek', value: 'Yüksek', group: 'water' },
 ];
 
-/**
- * Filtre Dropdown menüsünü ve interaktif (Client-side) mantığı yönetir.
- */
 export default function FilterDropdown() {
-    // Şimdilik sadece seçilen filtreleri tutmak için state kullanıyoruz
     const [selectedFilters, setSelectedFilters] = useState([]);
 
     const handleFilterChange = (e) => {
-        // Bu kısım, anlık filtreleme mantığınızın başlayacağı yerdir.
-        // Şimdilik sadece konsola loglama yapıyoruz.
         const { value, checked } = e.target;
-        
         if (checked) {
             setSelectedFilters(prev => [...prev, value]);
         } else {
             setSelectedFilters(prev => prev.filter(filter => filter !== value));
         }
-
         console.log("Seçilen filtreler:", selectedFilters);
     };
 
@@ -44,7 +35,10 @@ export default function FilterDropdown() {
               🔍 Filtreler
             </button>
             
-            <div className="dropdown-menu p-3" style={{ minWidth: '300px' }} data-bs-auto-close="outside">
+            {/* DÜZELTME BURADA YAPILDI: */}
+            {/* dropdown-menu-end: Menüyü sağa yaslar, sola doğru açılır. Ekran dışına taşmayı engeller. */}
+            {/* shadow: Menüye gölge ekler, daha belirgin olur. */}
+            <div className="dropdown-menu dropdown-menu-end shadow p-3" style={{ minWidth: '300px' }} data-bs-auto-close="outside">
               <h6 className="dropdown-header">Bakım Gereksinimleri</h6>
               
               <label className="fw-bold d-block mt-2">Işık İhtiyacı</label>
@@ -55,7 +49,7 @@ export default function FilterDropdown() {
                     type="checkbox" 
                     value={f.value} 
                     id={`light_${f.value}`} 
-                    onChange={handleFilterChange} // Event handler artık burada güvenli
+                    onChange={handleFilterChange} 
                   />
                   <label className="form-check-label" htmlFor={`light_${f.value}`}>{f.label}</label>
                 </div>
@@ -71,7 +65,7 @@ export default function FilterDropdown() {
                     type="checkbox" 
                     value={f.value} 
                     id={`water_${f.value}`} 
-                    onChange={handleFilterChange} // Event handler artık burada güvenli
+                    onChange={handleFilterChange} 
                   />
                   <label className="form-check-label" htmlFor={`water_${f.value}`}>{f.label}</label>
                 </div>
