@@ -8,7 +8,7 @@ export default function Home() {
     <main className="container py-5 ">
       <nav className="navbar bg-body-tertiary">
   <div className="container-fluid">
-    <form class="container-fluid justify-content-start">
+    <form className="container-fluid justify-content-start">
      <span className="navbar-brand mb-0 h1">Bitki Rehberi</span> 
       <button className="btn btn-sm btn-outline-secondary" type="button">Smaller button</button>
     </form>
