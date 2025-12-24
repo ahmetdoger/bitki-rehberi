@@ -2,8 +2,8 @@
 
 import React, { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Link from 'next/link'; // 👈 YENİ EKLENDİ
 
-// DİKKAT: ../../lib/api yolu önemlidir.
 import { getPlants } from '../../lib/api'; 
 import { useLanguage } from '../../context/LanguageContext';
 import { translate as tr } from '../../i18n/translations';
@@ -40,14 +40,17 @@ function BitkiListesiContent() {
       {/* BAŞLIK */}
       <div className="d-flex justify-content-between align-items-center mb-5 pb-3 border-bottom">
         <h1 className="h2 fw-bold text-success mb-1">
-            {categoryQuery ? `${t('results_for')} "${categoryQuery}"` : t('discover_plants')}
+            {categoryQuery 
+                ? `${t('results_for')} "${t(categoryQuery.toLowerCase())}"` 
+                : t('discover_plants')
+            }
         </h1>
         <span className="badge bg-secondary rounded-pill px-3 py-2">
             {loading ? '...' : `${plants.length} ${t('items_count')}`}
         </span>
       </div>
 
-      {loading && <div className="text-center py-5">Yükleniyor...</div>}
+      {loading && <div className="text-center py-5">{t('loading')}</div>}
 
       {!loading && plants.length > 0 && (
         <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
@@ -70,9 +73,14 @@ function BitkiListesiContent() {
                       </div>
                   </div>
 
-                  <button className="btn btn-outline-success w-100 btn-sm mt-3 fw-bold">
+                  {/* 👇 KRİTİK DEĞİŞİKLİK BURADA: Buton Link'e dönüştü */}
+                  <Link 
+                    href={`/bitkiler/${plant.id}`} 
+                    className="btn btn-outline-success w-100 btn-sm mt-3 fw-bold"
+                  >
                       {t('view_details')} ➜
-                  </button>
+                  </Link>
+
                 </div>
               </div>
             </div>
@@ -81,7 +89,7 @@ function BitkiListesiContent() {
       )}
       
       {!loading && plants.length === 0 && (
-         <div className="alert alert-light text-center py-5">Bitki bulunamadı.</div>
+         <div className="alert alert-light text-center py-5">{t('no_plants_found')}</div>
       )}
     </div>
   );

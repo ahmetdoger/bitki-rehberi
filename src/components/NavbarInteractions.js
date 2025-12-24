@@ -1,74 +1,81 @@
 'use client';
 
-import Link from 'next/link';
-import FilterDropdown from './FilterDropdown'; 
-import { useLanguage } from '../context/LanguageContext'; 
-
-// Dil Listesi (Bayraklar ve Kodlar)
-const languages = [
-    { code: 'en', label: 'English', flag: '🇬🇧' },
-    { code: 'tr', label: 'Türkçe', flag: '🇹🇷' },
-    { code: 'de', label: 'Deutsch', flag: '🇩🇪' },
-    { code: 'fr', label: 'Français', flag: '🇫🇷' },
-    { code: 'it', label: 'Italiano', flag: '🇮🇹' },
-    { code: 'es', label: 'Español', flag: '🇪🇸' },
-];
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useLanguage } from '../context/LanguageContext';
+import FilterDropdown from './FilterDropdown';
 
 export default function NavbarInteractions() {
-    const { language, setLanguage, t } = useLanguage();
+  const [searchTerm, setSearchTerm] = useState('');
+  const router = useRouter();
+  const { language, setLanguage, t } = useLanguage();
 
-    // Şu an seçili dilin bayrağını bul
-    const currentFlag = languages.find(l => l.code === language)?.flag || '🇬🇧';
+  const handleSearch = (e) => {
+    e.preventDefault();
+    // Boşsa işlem yapma
+    if (!searchTerm.trim()) return;
+    
+    // Arama sayfasına yönlendir (Query Parametresi ile)
+    router.push(`/bitkiler?q=${encodeURIComponent(searchTerm)}`);
+  };
 
-    const handleSearchSubmit = (e) => {
-        e.preventDefault();
-        console.log("Search triggered");
-    };
+  const toggleLanguage = () => {
+    const newLang = language === 'tr' ? 'en' : 'tr'; // Basit geçiş, istersen 6 dili dropdown yapabilirsin
+    setLanguage(newLang);
+  };
+  
+  // 6 Dil Seçeneği İçin Dropdown (Opsiyonel, yer varsa açılabilir)
+  const languages = [
+      { code: 'tr', label: '🇹🇷 TR' },
+      { code: 'en', label: '🇬🇧 EN' },
+      { code: 'de', label: '🇩🇪 DE' },
+      { code: 'fr', label: '🇫🇷 FR' },
+      { code: 'es', label: '🇪🇸 ES' },
+      { code: 'it', label: '🇮🇹 IT' },
+  ];
 
-    return (
-        <div className="d-flex flex-column flex-lg-row align-items-start align-items-lg-center gap-3">
-            
-            {/* 1. Arama */}
-            <form className="d-flex" role="search" onSubmit={handleSearchSubmit}>
-              <input 
-                className="form-control me-2" 
+  return (
+    <div className="d-flex flex-column flex-lg-row gap-3 align-items-lg-center">
+      
+      {/* 1. ARAMA FORMU */}
+      <form onSubmit={handleSearch} className="d-flex" role="search">
+        <div className="input-group">
+            <input 
+                className="form-control border-success" 
                 type="search" 
                 placeholder={t('search_placeholder')} 
-                aria-label="Search" 
-                style={{ width: 'auto', minWidth: '150px' }} 
-              />
-              <button className="btn btn-outline-light" type="submit">{t('search_button')}</button>
-            </form>
-
-            {/* 2. Filtreler */}
-            <FilterDropdown /> 
-
-            {/* 3. Dil Seçici (6 Dilli) */}
-            <div className="dropdown">
-              <button 
-                className="btn btn-outline-light dropdown-toggle text-nowrap"
-                type="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                {currentFlag} {language.toUpperCase()}
-              </button>
-              
-              <ul className="dropdown-menu dropdown-menu-end shadow" style={{ minWidth: '150px' }}>
-                {languages.map((lang) => (
-                    <li key={lang.code}>
-                        <button 
-                            className={`dropdown-item d-flex align-items-center justify-content-between ${language === lang.code ? 'active' : ''}`} 
-                            onClick={() => setLanguage(lang.code)}
-                        >
-                            <span>{lang.flag} {lang.label}</span>
-                            {language === lang.code && <span>✓</span>}
-                        </button>
-                    </li>
-                ))}
-              </ul>
-            </div>
-
+                aria-label="Search"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <button className="btn btn-outline-light bg-success" type="submit">
+                {t('search_button')}
+            </button>
         </div>
-    );
+      </form>
+
+      {/* 2. FİLTRE BUTONU (Mobil uyumlu olması için buraya aldım) */}
+      <FilterDropdown />
+
+      {/* 3. DİL SEÇİMİ */}
+      <div className="dropdown">
+        <button className="btn btn-outline-light dropdown-toggle text-uppercase" type="button" data-bs-toggle="dropdown">
+            {languages.find(l => l.code === language)?.label || '🌐'}
+        </button>
+        <ul className="dropdown-menu dropdown-menu-end">
+            {languages.map((lang) => (
+                <li key={lang.code}>
+                    <button 
+                        className={`dropdown-item ${language === lang.code ? 'active bg-success' : ''}`} 
+                        onClick={() => setLanguage(lang.code)}
+                    >
+                        {lang.label}
+                    </button>
+                </li>
+            ))}
+        </ul>
+      </div>
+
+    </div>
+  );
 }

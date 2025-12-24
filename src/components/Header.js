@@ -1,9 +1,12 @@
-'use client'; // BU SATIR ÇOK ÖNEMLİ
+'use client'; 
 
 import Link from "next/link";
 import NavbarInteractions from "./NavbarInteractions"; 
+import { useLanguage } from '../context/LanguageContext'; 
 
 export default function Header() {
+  const { t } = useLanguage(); 
+
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-success shadow-sm sticky-top" style={{ zIndex: 1040 }}>
       <div className="container-fluid container">
@@ -22,7 +25,6 @@ export default function Header() {
           <span className="navbar-toggler-icon"></span>
         </button>
         
-        {/* data-bs-scroll="true" ekledik: Mobilde menü açıkken sayfanın kaymasını engellememesi için */}
         <div 
             className="offcanvas-lg offcanvas-end flex-grow-1" 
             tabIndex="-1" 
@@ -30,7 +32,8 @@ export default function Header() {
             aria-labelledby="navbarOffcanvasLabel"
         >
           <div className="offcanvas-header bg-success text-white border-bottom border-white-50">
-            <h5 className="offcanvas-title" id="navbarOffcanvasLabel">Menü</h5>
+            {/* GÜNCELLEME: Menü başlığı çevrildi */}
+            <h5 className="offcanvas-title" id="navbarOffcanvasLabel">{t('menu')}</h5>
             <button 
                 type="button" 
                 className="btn-close btn-close-white" 

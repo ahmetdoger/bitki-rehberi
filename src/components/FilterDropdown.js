@@ -23,28 +23,23 @@ export default function FilterDropdown() {
     const handleFilterChange = (group, value, checked) => {
         const params = new URLSearchParams(searchParams.toString());
         
-        // 1. Mevcut değeri al (Örn: "full_sun,part_shade" veya null)
         const currentParam = params.get(group);
         let activeValues = currentParam ? currentParam.split(',') : [];
 
         if (checked) {
-            // Ekle: Eğer listede yoksa ekle
             if (!activeValues.includes(value)) {
                 activeValues.push(value);
             }
         } else {
-            // Çıkar: Seçimi kaldırılanı listeden sil
             activeValues = activeValues.filter(v => v !== value);
         }
 
-        // 2. Yeni değeri URL'ye yaz veya parametreyi sil
         if (activeValues.length > 0) {
-            params.set(group, activeValues.join(',')); // "full_sun,part_shade"
+            params.set(group, activeValues.join(','));
         } else {
             params.delete(group);
         }
 
-        // 3. Yönlendirme
         if (window.location.pathname === '/') {
             router.push(`/bitkiler?${params.toString()}`);
         } else {
@@ -52,7 +47,6 @@ export default function FilterDropdown() {
         }
     };
 
-    // Checkbox işaretli mi kontrolü (Dizinin içinde var mı?)
     const isChecked = (group, value) => {
         const currentParam = searchParams.get(group);
         if (!currentParam) return false;
@@ -104,8 +98,9 @@ export default function FilterDropdown() {
               ))}
               
                <div className="dropdown-divider"></div>
+               {/* GÜNCELLEME: Çeviri hook'u kullanıldı */}
                <p className="small text-muted mb-0">
-                   {language === 'tr' ? 'Çoklu seçim yapılabilir.' : 'Multiple selection allowed.'}
+                   {t('multiple_selection')}
                </p>
             </div>
         </div>
