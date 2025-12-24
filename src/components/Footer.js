@@ -1,18 +1,49 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function Footer() {
   const { t } = useLanguage();
 
   return (
-    <footer className="bg-success text-white py-3 mt-auto">
-      <div className="container d-flex flex-column flex-md-row justify-content-between align-items-center">
-        <p className="mb-2 mb-md-0">&copy; {new Date().getFullYear()} Bitki Rehberi. {t('rights_reserved')}</p>
-        <div className="d-flex gap-3">
-          <a href="/gizlilik" className="text-white text-decoration-none small">{t('privacy')}</a>
-          <a href="/kullanim-kosullari" className="text-white text-decoration-none small">{t('terms')}</a>
+    // py-3: İnce yükseklik
+    // mt-auto: İçerik azsa bile en alta yapışır
+    <footer className="bg-dark text-light py-3 mt-auto border-top border-secondary border-opacity-25">
+      <div className="container-fluid px-4 px-lg-5">
+        
+        {/* Mobilde alt alta, Masaüstünde sağ-sol yaslı */}
+        <div className="d-flex flex-column flex-md-row justify-content-between align-items-center small">
+          
+          {/* SOL TARAFA: Logo + Çevirili Haklar Yazısı */}
+          <div className="d-flex flex-column flex-md-row align-items-center gap-1 gap-md-2 mb-2 mb-md-0 opacity-75">
+            <div className="d-flex align-items-center gap-2">
+                <span>🌿</span>
+                <span className="fw-semibold">BitkiRehberi</span>
+            </div>
+            
+            {/* Masaüstünde araya çizgi koy, mobilde gizle */}
+            <span className="d-none d-md-inline">|</span>
+            
+            {/* SENİN İSTEDİĞİN ÇEVİRİ KISMI BURADA GERİ GELDİ 👇 */}
+            <span>{t('rights_reserved')} &copy; {new Date().getFullYear()}</span>
+          </div>
+
+          {/* SAĞ TARAFA: Menüler */}
+          <div className="d-flex gap-4">
+             <Link href="/" className="text-light text-decoration-none opacity-75 hover-opacity-100 transition-all">
+                {t('home')}
+             </Link>
+             <Link href="/bitkiler" className="text-light text-decoration-none opacity-75 hover-opacity-100 transition-all">
+                {t('plants')}
+             </Link>
+             {/* Tek link: Privacy & Terms */}
+             <Link href="/privacy" className="text-light text-decoration-none opacity-75 hover-opacity-100 transition-all">
+                Privacy & Terms
+             </Link>
+          </div>
+
         </div>
       </div>
     </footer>

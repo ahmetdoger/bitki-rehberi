@@ -1,81 +1,45 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useLanguage } from '../context/LanguageContext';
-import FilterDropdown from './FilterDropdown';
+import Link from 'next/link';
+import NavbarInteractions from './NavbarInteractions';
 
-export default function NavbarInteractions() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const router = useRouter();
-  const { language, setLanguage, t } = useLanguage();
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    // Boşsa işlem yapma
-    if (!searchTerm.trim()) return;
-    
-    // Arama sayfasına yönlendir (Query Parametresi ile)
-    router.push(`/bitkiler?q=${encodeURIComponent(searchTerm)}`);
-  };
-
-  const toggleLanguage = () => {
-    const newLang = language === 'tr' ? 'en' : 'tr'; // Basit geçiş, istersen 6 dili dropdown yapabilirsin
-    setLanguage(newLang);
-  };
-  
-  // 6 Dil Seçeneği İçin Dropdown (Opsiyonel, yer varsa açılabilir)
-  const languages = [
-      { code: 'tr', label: '🇹🇷 TR' },
-      { code: 'en', label: '🇬🇧 EN' },
-      { code: 'de', label: '🇩🇪 DE' },
-      { code: 'fr', label: '🇫🇷 FR' },
-      { code: 'es', label: '🇪🇸 ES' },
-      { code: 'it', label: '🇮🇹 IT' },
-  ];
-
+export default function Navbar() {
   return (
-    <div className="d-flex flex-column flex-lg-row gap-3 align-items-lg-center">
+    // py-3: Dikey boşluk (Footer ile uyumlu olsun diye)
+    <nav className="navbar navbar-expand-lg navbar-dark bg-success shadow-sm py-3">
       
-      {/* 1. ARAMA FORMU */}
-      <form onSubmit={handleSearch} className="d-flex" role="search">
-        <div className="input-group">
-            <input 
-                className="form-control border-success" 
-                type="search" 
-                placeholder={t('search_placeholder')} 
-                aria-label="Search"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <button className="btn btn-outline-light bg-success" type="submit">
-                {t('search_button')}
-            </button>
-        </div>
-      </form>
+      {/* 👇 DEĞİŞİKLİK BURADA: Footer ile birebir aynı sınıfı kullandık */}
+      <div className="container-fluid px-4 px-lg-5">
+        
+        {/* LOGO KISMI */}
+        <Link href="/" className="navbar-brand d-flex align-items-center gap-2">
+           <span className="fs-1">🌿</span>
+           <div className="d-flex flex-column lh-1">
+              <span className="fw-bold fs-4 tracking-tight">BitkiRehberi</span>
+              <small className="fs-7 opacity-75" style={{ letterSpacing: '1px' }}>BOTANICAL GUIDE</small>
+           </div>
+        </Link>
 
-      {/* 2. FİLTRE BUTONU (Mobil uyumlu olması için buraya aldım) */}
-      <FilterDropdown />
-
-      {/* 3. DİL SEÇİMİ */}
-      <div className="dropdown">
-        <button className="btn btn-outline-light dropdown-toggle text-uppercase" type="button" data-bs-toggle="dropdown">
-            {languages.find(l => l.code === language)?.label || '🌐'}
+        {/* MOBİL MENÜ BUTONU (Hamburger) */}
+        <button 
+          className="navbar-toggler border-0" 
+          type="button" 
+          data-bs-toggle="collapse" 
+          data-bs-target="#navbarContent"
+        >
+          <span className="navbar-toggler-icon"></span>
         </button>
-        <ul className="dropdown-menu dropdown-menu-end">
-            {languages.map((lang) => (
-                <li key={lang.code}>
-                    <button 
-                        className={`dropdown-item ${language === lang.code ? 'active bg-success' : ''}`} 
-                        onClick={() => setLanguage(lang.code)}
-                    >
-                        {lang.label}
-                    </button>
-                </li>
-            ))}
-        </ul>
-      </div>
 
-    </div>
+        {/* SAĞ TARAFA YASLANACAK İÇERİK */}
+        <div className="collapse navbar-collapse justify-content-end" id="navbarContent">
+            
+            {/* Mobilde arama ve dil seçenekleri aşağı inerken biraz boşluk bırak */}
+            <div className="mt-3 mt-lg-0 w-100 w-lg-auto">
+                <NavbarInteractions />
+            </div>
+
+        </div>
+      </div>
+    </nav>
   );
 }
