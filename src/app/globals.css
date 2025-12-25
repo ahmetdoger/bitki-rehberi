@@ -1,0 +1,86 @@
+:root {
+    --background: #ffffff;
+    --foreground: #171717;
+}
+
+body {
+    background-color: #f8f9fa;
+    font-family: 'Inter', sans-serif;
+    padding-bottom: 70px;
+}
+
+/* Kart Hover Efekti */
+.hover-shadow:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, .175) !important;
+}
+
+/* Resim üzeri gradient (okunabilirlik için) */
+.bg-gradient-dark-transparent {
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
+}
+
+/* Özel Scrollbar (Detay sayfası için) */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* --- NAVBAR RESPONSIVE STYLES --- */
+
+/* Mobil (Varsayılan): Siyah border ve yazı (Çünkü arkaplan beyaz) */
+.nav-input-responsive {
+    background-color: #f8f9fa;
+    color: #212529;
+    border: 1px solid #dee2e6;
+}
+
+.nav-input-responsive::placeholder {
+    color: #6c757d;
+}
+
+.nav-btn-responsive {
+    color: #212529;
+    border-color: #212529;
+}
+
+.nav-btn-responsive:hover {
+    background-color: #212529;
+    color: #fff;
+}
+
+/* Desktop (Large screens): Beyaz border ve yazı (Çünkü arkaplan yeşil) */
+@media (min-width: 992px) {
+    .nav-input-responsive {
+        background-color: rgba(255, 255, 255, 0.25) !important;
+        color: #fff !important;
+        border: none !important;
+    }
+
+    .nav-input-responsive::placeholder {
+        color: rgba(255, 255, 255, 0.75) !important;
+    }
+
+    .nav-btn-responsive {
+        color: #f8f9fa;
+        border-color: #f8f9fa;
+    }
+
+    .nav-btn-responsive:hover {
+        background-color: #f8f9fa;
+        color: #198754;
+        /* success color */
+    }
+}

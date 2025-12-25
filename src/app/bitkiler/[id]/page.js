@@ -2,14 +2,14 @@
 
 import React, { useEffect, useState, use } from 'react';
 import Link from 'next/link';
-import { getPlantDetail } from '../../../lib/api'; 
+import { getPlantDetail } from '../../../lib/api';
 import { useLanguage } from '../../../context/LanguageContext';
 import { translate as tr } from '../../../i18n/translations';
 
 export default function PlantDetailPage({ params }) {
     const { id } = use(params);
     const { t, language } = useLanguage();
-    
+
     const [plant, setPlant] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -20,20 +20,20 @@ export default function PlantDetailPage({ params }) {
             setPlant(data);
             setLoading(false);
         }
-        if(id) fetchDetail();
+        if (id) fetchDetail();
     }, [id]);
 
     // --- AKILLI ÇEVİRİ FONKSİYONU ---
     const translatePropagation = (propString) => {
         if (!propString || propString === 'Natural' || propString === 'Unknown') return propString;
-        
+
         return propString.split(',').map(item => {
             const rawItem = item.trim().toLowerCase();
             const key = rawItem.replace(/ /g, '_');
-            
+
             // Önce sözlükte direkt ara
             const translated = tr(key, language);
-            
+
             // Eğer çeviri İngilizce kaldıysa, içinde tanıdık kök ara
             if (translated === key || translated.toLowerCase() === rawItem) {
                 if (rawItem.includes('cutting')) return tr('cuttings', language);
@@ -44,7 +44,7 @@ export default function PlantDetailPage({ params }) {
                 if (rawItem.includes('offset')) return tr('offsets', language);
                 if (rawItem.includes('sucker')) return tr('suckers', language);
             }
-            
+
             return translated;
         }).join(', ');
     };
@@ -70,32 +70,32 @@ export default function PlantDetailPage({ params }) {
         <div className="container py-5">
             {/* ÜST KISIM: HİZALAMA DÜZELTİLDİ (align-items-start) */}
             <div className="row mb-5 align-items-start">
-                
+
                 {/* SOL: RESİM */}
                 <div className="col-lg-6 mb-4 mb-lg-0">
                     <div className="rounded-4 overflow-hidden shadow-lg position-relative" style={{ height: '400px' }}>
-                        <img 
-                            src={plant.image} 
-                            alt={plant.name} 
+                        <img
+                            src={plant.image}
+                            alt={plant.name}
                             className="w-100 h-100 object-fit-cover"
                         />
                     </div>
                 </div>
 
                 {/* SAĞ: YAZI (Tepeden başlıyor ve resmi geçmiyor) */}
-                <div className="col-lg-6 d-flex flex-column justify-content-start" style={{ height: '400px' }}> 
+                <div className="col-lg-6 d-flex flex-column justify-content-start" style={{ height: '400px' }}>
                     <h1 className="display-4 fw-bold text-success mb-2 mt-0 lh-1">{plant.name}</h1>
                     <h4 className="text-muted fst-italic mb-3">{plant.scientific_name}</h4>
-                    
+
                     {/* Kaydırma çubuğu (scroll) eklenmiş açıklama alanı */}
                     <div className="flex-grow-1 overflow-auto pe-2 custom-scrollbar">
                         <p className="lead text-secondary mb-0">
-                            {plant.description || (language === 'tr' ? 
-                                "Bu bitki hakkında detaylı açıklama şu anda hazırlanmaktadır. Aşağıdaki teknik tablodan tüm bakım ihtiyaçlarını detaylıca inceleyebilirsiniz." : 
+                            {plant.description || (language === 'tr' ?
+                                "Bu bitki hakkında detaylı açıklama şu anda hazırlanmaktadır. Aşağıdaki teknik tablodan tüm bakım ihtiyaçlarını detaylıca inceleyebilirsiniz." :
                                 "Detailed description for this plant is currently being prepared. Please verify care requirements in the table below.")}
                         </p>
                     </div>
-                    
+
                     <div className="mt-3">
                         <Link href="/bitkiler" className="btn btn-outline-dark rounded-pill px-4">
                             ← {t('plants')}
@@ -112,14 +112,14 @@ export default function PlantDetailPage({ params }) {
                             <h3 className="card-title fw-bold mb-4 text-success border-bottom pb-2">
                                 📋 {t('care_guide_title')}
                             </h3>
-                            
+
                             <div className="row g-4">
                                 {/* 1. SATIR: TEMEL İHTİYAÇLAR */}
                                 <div className="col-lg-3 col-md-6">
                                     <div className="p-3 bg-white rounded shadow-sm h-100 border-start border-4 border-warning">
                                         <small className="text-muted text-uppercase fw-bold">☀️ {t('sunlight_label')}</small>
                                         <p className="fs-5 fw-semibold mb-0 text-dark">
-                                            {tr(plant.sunlight.split(',')[0].trim().replace(/ /g,'_'), language)}
+                                            {tr(plant.sunlight.split(',')[0].trim().replace(/ /g, '_'), language)}
                                         </p>
                                     </div>
                                 </div>
@@ -138,7 +138,32 @@ export default function PlantDetailPage({ params }) {
                                 <div className="col-lg-3 col-md-6">
                                     <div className="p-3 bg-white rounded shadow-sm h-100 border-start border-4 border-danger">
                                         <small className="text-muted text-uppercase fw-bold">🌍 {t('hardiness_label')}</small>
-                                        <p className="fs-5 fw-semibold mb-0 text-dark">{plant.hardiness}</p>
+                                        <p className="fs-5 fw-semibold mb-1 text-dark">{plant.hardiness}</p>
+
+                                        {/* DETAYLI SICAKLIK BİLGİSİ */}
+                                        {(() => {
+                                            const getMinTemp = (h) => {
+                                                const match = h?.match(/\d+/);
+                                                if (!match) return null;
+                                                const zone = parseInt(match[0]);
+                                                // Yaklaşık USDA Zone -> °C Dönüşümü
+                                                const temps = {
+                                                    1: -51, 2: -45, 3: -40, 4: -34, 5: -29,
+                                                    6: -23, 7: -18, 8: -12, 9: -7, 10: -1,
+                                                    11: 4, 12: 10, 13: 15
+                                                };
+                                                return temps[zone];
+                                            };
+                                            const temp = getMinTemp(plant.hardiness);
+                                            return temp !== null ? (
+                                                <small className="d-block text-muted" style={{ fontSize: '0.85rem' }}>
+                                                    {language === 'tr'
+                                                        ? `Min. ${temp}°C'ye kadar dayanır`
+                                                        : `Hardy down to ${temp}°C`
+                                                    }
+                                                </small>
+                                            ) : null;
+                                        })()}
                                     </div>
                                 </div>
 

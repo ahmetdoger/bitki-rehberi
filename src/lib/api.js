@@ -1,6 +1,8 @@
-import { plants as localPlants } from '../data/plants'; 
+import { plants as localPlants } from '../data/plants';
 
-const API_KEY = 'sk-NKLS69418ed0d186d13981'; 
+// API Key server-side (route handler) üzerinden yönetiliyor.
+// const API_KEY = '...'; // REMOVED
+
 const BASE_URL = 'https://perenual.com/api';
 
 // --- YARDIMCI FONKSİYON: GÜNEŞ VERİSİNİ ZORLA DÜZELT ---
@@ -12,14 +14,15 @@ function normalizeSunlight(input) {
     if (text.includes('part_shade') || (text.includes('part') && text.includes('shade'))) return 'part_shade';
     if (text.includes('part_sun') || (text.includes('part') && text.includes('sun'))) return 'part_sun';
     if (text.includes('full_shade') || (text.includes('full') && text.includes('shade'))) return 'full_shade';
-    
+
     if (text.includes('sun')) return 'full_sun';
     return 'unknown';
 }
 
-// 1. LİSTELEME FONKSİYONU
+// 1. DATA FETCHING - HYBRID (Try API -> Fallback to Local)
 export async function getPlants(params = {}) {
-    let url = `${BASE_URL}/v2/species-list?key=${API_KEY}&page=1`;
+    // Proxy Route'a istek atıyoruz (API Key orada gizli)
+    let url = `/api/plants?page=1`;
 
     // 🔍 ARAMA PARAMETRESİ EKLENDİ (q)
     if (params.q) {
@@ -31,21 +34,28 @@ export async function getPlants(params = {}) {
         const cat = params.category.toLowerCase();
         if (cat === 'indoor') url += '&indoor=1';
         else if (cat === 'outdoor') url += '&indoor=0';
-        else if (cat === 'flowering') url += '&q=flower'; 
-        else if (cat === 'cyclemix') url += '&cycle=perennial'; 
-        else if (!params.q) url += `&q=${cat}`; // Eğer özel arama yoksa kategoriyi arama gibi kullan
+        else if (cat === 'flowering') url += '&q=flower';
+        else if (cat === 'cyclemix') url += '&cycle=perennial';
+        else if (!params.q) url += `&q=${cat}`;
     }
 
     if (params.sunlight) url += `&sunlight=${params.sunlight}`;
     if (params.watering) url += `&watering=${params.watering}`;
 
     try {
+        console.log("Fetching from API:", url);
         const res = await fetch(url, { cache: 'no-store' });
-        if (!res.ok) throw new Error(`API Hatası: ${res.status}`);
-        const data = await res.json();
-        
-        if(data.error || !data.data || data.data.length === 0) throw new Error('Veri yok');
 
+        if (!res.ok) {
+            const errText = await res.text();
+            console.warn(`Real API Failed (${res.status}): ${errText}`);
+            throw new Error(`API Error: ${res.status}`);
+        }
+
+        const data = await res.json();
+        if (data.error || !data.data || data.data.length === 0) throw new Error('Veri yok');
+
+        console.log("API Success! Returning real data.");
         return data.data.map(item => {
             const cleanSun = normalizeSunlight(item.sunlight);
             return {
@@ -55,13 +65,12 @@ export async function getPlants(params = {}) {
                 image: item.default_image?.regular_url || 'https://images.unsplash.com/photo-1463936575829-25148e1db1b8?w=600&q=80',
                 light: cleanSun,
                 water: item.watering ? item.watering.toLowerCase() : 'average',
-                category: params.category || 'General' 
+                category: params.category || 'General'
             };
         });
 
     } catch (error) {
-        console.warn("API sorunu, yedek veri dönülüyor.", error.message);
-        // Yedek veride arama yapmak için filtre fonksiyonunu da güncellememiz gerekir ama şimdilik API odaklıyız.
+        console.warn("API Erişilemedi, Gelişmiş Yedek Veri kullanılıyor.", error.message);
         return filterLocalData(localPlants, params);
     }
 }
@@ -75,19 +84,25 @@ function filterLocalData(data, params) {
         // Arama (İsimde geçiyor mu?)
         if (params.q) {
             const term = params.q.toLowerCase();
-            if (!plant.name.toLowerCase().includes(term) && 
+            if (!plant.name.toLowerCase().includes(term) &&
                 !plant.scientific_name.toLowerCase().includes(term)) {
                 return false;
             }
         }
-        
+
         if (params.category) {
             const pCat = plant.category.toLowerCase();
             const qCat = params.category.toLowerCase();
             if (qCat !== 'cyclemix' && !pCat.includes(qCat) && !qCat.includes(pCat)) return false;
         }
-        if (params.sunlight && plant.light !== params.sunlight) return false;
-        if (params.watering && plant.water !== params.watering) return false;
+        if (params.sunlight) {
+            const suns = params.sunlight.split(',');
+            if (!suns.includes(plant.light)) return false;
+        }
+        if (params.watering) {
+            const waters = params.watering.split(',');
+            if (!waters.includes(plant.water)) return false;
+        }
         return true;
     });
 }
@@ -96,34 +111,27 @@ function filterLocalData(data, params) {
 // Eksik kalmasın diye getPlantDetail'i tekrar yazmama gerek yok, sadece getPlants ve filterLocalData değişti.
 // Ancak "export async function getPlantDetail..." kısmının silinmediğinden emin ol.
 export async function getPlantDetail(id) {
-    // ... (Önceki kodun aynısı) ...
     const localPlant = localPlants.find(p => p.id.toString() === id.toString());
-    try {
-        const res = await fetch(`${BASE_URL}/v2/species/details/${id}?key=${API_KEY}`, { cache: 'no-store' });
-        if (!res.ok) throw new Error('Detay API Hatası');
-        const data = await res.json();
+
+    if (localPlant) {
         return {
-            id: data.id,
-            name: data.common_name || 'Bilinmeyen Bitki',
-            scientific_name: data.scientific_name ? data.scientific_name[0] : '',
-            description: data.description || null,
-            cycle: data.cycle || 'Unknown',
-            propagation: data.propagation ? data.propagation.join(', ') : 'Natural',
-            sunlight: data.sunlight ? data.sunlight.join(', ') : 'Unknown',
-            watering: data.watering || 'Average',
-            hardiness: data.hardiness ? `${data.hardiness.min} - ${data.hardiness.max}` : 'Adaptable',
-            maintenance: data.maintenance || 'Medium',
-            growth_rate: data.growth_rate || 'Moderate',
-            indoor: data.indoor ? 'Yes' : 'No',
-            care_level: data.care_level || 'Medium',
-            image: data.default_image?.regular_url || (localPlant ? localPlant.image : 'https://images.unsplash.com/photo-1463936575829-25148e1db1b8?w=600&q=80')
+            id: localPlant.id,
+            name: localPlant.name,
+            scientific_name: localPlant.scientific_name,
+            description: localPlant.description || "A wonderful plant.",
+            cycle: "Perennial", // Mock default
+            propagation: "Seeds, Division",
+            sunlight: Array.isArray(localPlant.sunlight) ? localPlant.sunlight.join(', ') : localPlant.light,
+            watering: localPlant.water,
+            hardiness: "Zone 5-11",
+            maintenance: localPlant.maintenance || "Medium",
+            growth_rate: localPlant.growth_rate || "Moderate",
+            indoor: localPlant.indoor,
+            care_level: localPlant.care_level || "Medium",
+            image: localPlant.image
         };
-    } catch (error) {
-        if (localPlant) {
-            return { ...localPlant, description: "API erişilemiyor.", cycle: "Perennial", propagation: "Seeds", sunlight: localPlant.light, watering: localPlant.water, hardiness: "Zone 5-9", maintenance: "Low", growth_rate: "High", indoor: "Yes", care_level: "Easy" };
-        }
-        return null;
     }
+    return null;
 }
 export async function getSpecificRandomImage(categoryType) {
     // ... (Önceki kodun aynısı) ...
