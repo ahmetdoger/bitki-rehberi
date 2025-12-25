@@ -1,0 +1,25 @@
+
+> bitki-rehberi@0.1.0 build
+> next build
+
+   ▲ Next.js 16.0.8 (Turbopack)
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 994.0ms
+   Running TypeScript ...
+   Collecting page data using 15 workers ...
+   Generating static pages using 15 workers (0/6) ...
+ ⨯ useSearchParams() should be wrapped in a suspense boundary at page "/404". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at S (/home/admin/Belgeler/GitHub/bitki-rehberi/.next/server/chunks/ssr/node_modules_next_cf02c53c._.js:2:2111)
+    at p (/home/admin/Belgeler/GitHub/bitki-rehberi/.next/server/chunks/ssr/node_modules_next_cf02c53c._.js:4:4847)
+    at i (/home/admin/Belgeler/GitHub/bitki-rehberi/.next/server/chunks/ssr/[root-of-the-server]__3717f2fa._.js:1:3921)
+    at ar (/home/admin/Belgeler/GitHub/bitki-rehberi/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:84366)
+    at aa (/home/admin/Belgeler/GitHub/bitki-rehberi/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:86185)
+    at as (/home/admin/Belgeler/GitHub/bitki-rehberi/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:107952)
+    at ao (/home/admin/Belgeler/GitHub/bitki-rehberi/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:105374)
+    at ah (/home/admin/Belgeler/GitHub/bitki-rehberi/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:112881)
+    at al (/home/admin/Belgeler/GitHub/bitki-rehberi/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:109984)
+    at as (/home/admin/Belgeler/GitHub/bitki-rehberi/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:108230)
+Error occurred prerendering page "/_not-found". Read more: https://nextjs.org/docs/messages/prerender-error
+Export encountered an error on /_not-found/page: /_not-found, exiting the build.
+ ⨯ Next.js build worker exited with code: 1 and signal: null
